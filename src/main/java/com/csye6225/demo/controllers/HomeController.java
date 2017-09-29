@@ -14,10 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,8 +31,7 @@ public class HomeController {
 
   @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public String welcome(Model model) throws Exception {
-    model.addAttribute("user", new User());
+  public String welcome() throws Exception {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("message", "you are not logged in. Go to /user/register to register yourself");
     return jsonObject.toString();
@@ -51,7 +47,6 @@ public class HomeController {
   }
 
   @RequestMapping(value = "/testPost", method = RequestMethod.POST, produces = "application/json")
-  @ResponseBody
   public String testPost() {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("message", "authorized for /testPost");
@@ -59,38 +54,14 @@ public class HomeController {
   }
 
 
-    @RequestMapping(value = "/register.htm", method = RequestMethod.POST)
-    protected String registerNewUser(HttpServletRequest request, @ModelAttribute("user") User user,
-                                           BindingResult result) throws Exception {
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    protected String registerNewUser(@RequestBody User user) throws Exception {
+      System.out.println(user.getEmailId());
 
-        JsonObject jsonObject = new JsonObject();
-        try {
-
-            if (userDao.findUserByEmailId(user.getEmailId()) == null) {
-               BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-               String hashedPassword = passwordEncoder.encode(user.getPassword());
-               user.setPassword(hashedPassword);
-                userDao.save(user);
-               // session.invalidate();
-
-                jsonObject.addProperty("message", "You are registered");
-
-                return jsonObject.toString();
-            } else {
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("message", "You are not registered");
-
-                return jsonObject.toString();
-            }
+      return null;
 
 
-        } catch (IllegalStateException e) {
-            System.out.println("* IllegalStateException: " + e.getMessage());
 
-        } catch (Exception e) {
-            System.out.println("* Exception: " + e.getMessage());
-        }
-            return
     }
 
 
